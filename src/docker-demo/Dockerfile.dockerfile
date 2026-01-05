@@ -1,7 +1,5 @@
 FROM python:3.9-alpine
 
-LABEL maintainer="xjn@xxt.com"
-
 WORKDIR /app
 
 ENV APP_NAME="MyFlaskApp" \
@@ -9,7 +7,8 @@ ENV APP_NAME="MyFlaskApp" \
     LOG_LEVEL="INFO"
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY app.py .
 
