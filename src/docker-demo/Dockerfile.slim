@@ -1,8 +1,8 @@
 FROM python:3.9-slim AS builder
 WORKDIR /app
-
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt -t /app/deps
+
+RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple -t /app/deps
 
 FROM python:3.9-alpine
 WORKDIR /app
@@ -11,9 +11,11 @@ COPY --from=builder /app/deps /app/deps
 COPY app.py .
 
 ENV PYTHONPATH=/app/deps
+
 ENV APP_NAME="SlimFlaskApp" PORT=5000
 
 RUN mkdir -p /app/logs && chmod 777 /app/logs
+
 EXPOSE $PORT
 
 CMD ["python", "app.py"]
