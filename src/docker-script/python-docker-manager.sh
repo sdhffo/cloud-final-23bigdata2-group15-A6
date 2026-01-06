@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-## ===================== 自动安装Docker（核心新增） =====================
+## ===================== 自动安装Docker =====================
 install_docker() {
     echo -e "\033[0;34m[INFO]\033[0m 检测Docker环境..."
     if command -v docker &> /dev/null && docker --version &> /dev/null; then
