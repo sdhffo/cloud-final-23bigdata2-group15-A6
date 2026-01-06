@@ -194,6 +194,7 @@ chmod +x python-docker-manager.sh docker-manager-utils.sh
 1. 《Docker 实战》第 3 章：Docker 镜像构建（人民邮电出版社）
 2. Docker 官方文档：Dockerfile 参考（https://docs.docker.com/engine/reference/builder/）
 3. Docker Compose 官方文档：环境变量配置（https://docs.docker.com/compose/environment-variables/）
+4. 容器镜像最佳实践（https://github.com/goldmann/docker-best-practices）
 
 ## 代码仓库地址
 https://github.com/sdhffo/cloud-final-23bigdata2-group15-A6
