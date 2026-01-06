@@ -18,12 +18,12 @@ cloud-final-23bigdata2-group15-A6/
 │   │   ├── docker-manager.conf  # 多环境配置文件（镜像名、端口等）
 │   │   ├── docker-manager-utils.sh  # 工具函数库（依赖安装、日志输出）
 │   │   └── python-docker-manager.sh  # 主脚本入口（命令解析、逻辑分发）
-│   ├── docker-demo/           # Docker 演示案例（Flask应用）
-│   │   ├── app.py             # 演示应用主程序
-│   │   ├── Dockerfile         # 基础镜像构建文件
-│   │   ├── Dockerfile.slim    # 多阶段构建瘦身镜像文件
-│   │   ├── manage-flask.sh    # 镜像瘦身效果验证脚本
-│   │   └── requirements.txt   # Python 依赖清单
+│   └── docker-demo/           # Docker 演示案例（Flask应用）
+│       ├── app.py             # 演示应用主程序
+│       ├── Dockerfile         # 基础镜像构建文件
+│       ├── Dockerfile.slim    # 多阶段构建瘦身镜像文件
+│       ├── manage-flask.sh    # 镜像瘦身效果验证脚本
+│       └── requirements.txt   # Python 依赖清单
 └── assets/                    # 项目截图、拓扑图、日志片段等资源
 ```
 
@@ -51,10 +51,20 @@ cloud-final-23bigdata2-group15-A6/
 
 ## 快速开始
 ### 前置条件
-- 硬件要求：CPU ≥ Intel i7-13650HX、内存 ≥ 5GB、磁盘 ≥ 50GB SSD
-- 软件环境：Ubuntu 24.04 LTS 系统、Docker 29.1.3+、Docker Compose v2.21.0+
-- 网络环境：可访问互联网（拉取基础镜像与依赖）
-- 权限要求：宿主机 sudo 权限（执行 Docker 命令与环境配置）
+#### 硬件要求
+- 处理器：Intel Core i5 及以上或同等性能 AMD 处理器
+- 内存：≥ 4GB（推荐 8GB 及以上，确保容器运行流畅）
+- 存储空间：≥ 30GB 可用磁盘空间（用于存储基础镜像、构建产物及依赖）
+- 网络环境：可访问互联网（用于拉取基础镜像、依赖包及配置镜像源）
+
+#### 软件环境
+- 操作系统：支持 Linux（Ubuntu 20.04 LTS 及以上、CentOS 7 及以上等）、macOS（10.15 及以上）、Windows 10/11（需启用 WSL2 或 Docker Desktop）
+- 核心软件：Docker 20.0 及以上版本、Docker Compose v2.0 及以上版本
+- 依赖组件：Python 3.7 及以上（基础镜像内置，本地环境可选）、Git（用于代码仓库克隆）
+
+#### 权限要求
+-  Linux/macOS：具备 sudo 权限（用于安装 Docker、配置系统环境）
+-  Windows：使用管理员权限运行 Docker Desktop 或 WSL2 终端
 
 ### 环境准备
 1. 克隆代码仓库
@@ -65,16 +75,23 @@ cd cloud-final-23bigdata2-group15-A6
 
 2. 一键安装 Docker（若未安装）
 ```bash
+# Linux/macOS 一键安装脚本
 curl -fsSL https://get.docker.com -o install-docker.sh
 sudo sh install-docker.sh
-# 配置用户免 sudo 执行 Docker 命令（需重新登录终端生效）
+
+# Windows 用户：直接下载 Docker Desktop 安装（https://www.docker.com/products/docker-desktop/）
+
+# 配置用户免 sudo 执行 Docker 命令（Linux/macOS，需重新登录终端生效）
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
 3. 配置 Docker 国内镜像源（加速镜像拉取）
 ```bash
+# Linux/macOS 配置方式
 sudo vim /etc/docker/daemon.json
+
+# Windows/macOS：通过 Docker Desktop 图形界面配置（设置 -> Docker Engine）
 ```
 粘贴以下配置并重启 Docker：
 ```json
@@ -88,7 +105,10 @@ sudo vim /etc/docker/daemon.json
 }
 ```
 ```bash
+# Linux/macOS 重启 Docker
 sudo service docker restart
+
+# Windows/macOS：在 Docker Desktop 中点击重启按钮
 ```
 
 ### 核心功能使用
@@ -106,8 +126,9 @@ curl http://localhost:8080
 
 #### 2. 镜像瘦身验证（使用专用脚本）
 ```bash
-# 赋予脚本执行权限
+# 赋予脚本执行权限（Linux/macOS）
 chmod +x manage-flask.sh
+# Windows 用户：在 WSL2 或 Git Bash 中执行
 # 一键构建基础镜像与瘦身镜像
 ./manage-flask.sh build
 # 启动瘦身镜像容器（端口 8081）
@@ -122,8 +143,9 @@ chmod +x manage-flask.sh
 ```bash
 # 进入工具目录
 cd src/PyDockerManager
-# 赋予脚本执行权限
+# 赋予脚本执行权限（Linux/macOS）
 chmod +x python-docker-manager.sh docker-manager-utils.sh
+# Windows 用户：在 WSL2 或 Git Bash 中执行
 # 初始化环境（生成依赖文件、Dockerfile）
 ./python-docker-manager.sh init
 # 构建 dev 环境镜像
@@ -155,24 +177,23 @@ chmod +x python-docker-manager.sh docker-manager-utils.sh
 | 镜像瘦身效果        | `docker build -f Dockerfile.slim -t docker-demo:v1.0-slim .`              | `docker images` 查看体积（≈86.1MB）       |
 
 ## 常见问题与排错
-1. **依赖安装速度慢/超时**：Dockerfile 中 pip 安装命令已配置清华大学镜像源（`-i https://pypi.tuna.tsinghua.edu.cn/simple`），若仍有问题可检查网络或更换 `daemon.json` 中的 Docker 镜像源
-2. **容器启动后无法访问**：确保 Flask 应用启动命令绑定 `host='0.0.0.0'`（已在 app.py 中配置），且端口映射正确（`-p 宿主机端口:5000`）
-3. **代码修改后不生效**：开发环境需启动 Flask 调试模式（`debug=True`），且通过 `-v` 挂载主机目录，确保文件同步后应用自动重载
+1. **依赖安装速度慢/超时**：Dockerfile 中已配置清华大学镜像源，若仍有问题可检查网络或更换 `daemon.json` 中的 Docker 镜像源
+2. **容器启动后无法访问**：确保 Flask 应用绑定 `host='0.0.0.0'`（已在 app.py 中配置），且端口映射正确（`-p 宿主机端口:5000`）
+3. **代码修改后不生效**：开发环境需开启 Flask 调试模式（`debug=True`），并通过 `-v` 挂载主机目录，确保文件同步后应用自动重载
 4. **镜像推送 Registry 失败**：确认本地 Registry 已启动（`docker run -d -p 5000:5000 registry:2`），镜像标签包含仓库地址前缀（如 `localhost:5000/docker-demo:v1.0`）
 
 ## 项目成员与分工
 | 成员       | 学号         | 负责模块                     | 核心贡献                                 |
 |------------|--------------|------------------------------|------------------------------------------|
-| 王公泽     | 2362160044   | 脚本程序、PPT、答辩          | 编写 manage-flask.sh、制作答辩PPT、现场答辩 |
+| 王公泽     | 2362160044   | 脚本程序、PPT、答辩          | 编写 manage-flask.sh、协助制作PPT、现场答辩 |
 | 沈旭涛     | 2362160045   | 脚本程序、实验报告、验证与排错 | 编写 PyDockerManager、撰写实验报告、问题排查 |
-| 徐兢男     | 2362160046   | 实验程序、PPT                | 编写 Dockerfile、协助制作PPT              |
+| 徐兢男     | 2362160046   | 实验程序、PPT                | 编写 Dockerfile、制作答辩PPT              |
 | 沈浩男     | 2362160047   | 环境搭建、实验程序           | 搭建实验环境、编写容器运行相关命令        |
 
 ## 参考资料
 1. 《Docker 实战》第 3 章：Docker 镜像构建（人民邮电出版社）
 2. Docker 官方文档：Dockerfile 参考（https://docs.docker.com/engine/reference/builder/）
 3. Docker Compose 官方文档：环境变量配置（https://docs.docker.com/compose/environment-variables/）
-4. 容器镜像最佳实践（https://github.com/goldmann/docker-best-practices）
 
 ## 代码仓库地址
 https://github.com/sdhffo/cloud-final-23bigdata2-group15-A6
